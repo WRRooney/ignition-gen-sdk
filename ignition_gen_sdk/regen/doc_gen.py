@@ -40,7 +40,7 @@ The Ignition Gateway HTTP API uses a custom header token for all requests.
 
 **Header name:** `X-Ignition-API-Token`
 
-**Format:** `<name>:<secret>`, exactly as the gateway API Tokens page shows it.
+**Format:** `<name>:<secret>`, exactly as the gateway shows it when the API key is created.
 
 Set `IGNITION_API_TOKEN` to that full value (env or `.env`). The header sent is:
 

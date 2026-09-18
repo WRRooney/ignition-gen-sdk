@@ -31,8 +31,8 @@ from ..backends.api_client import (
 
 # Hint strings — one line per error class.
 _HINTS: dict[type, str] = {
-    AuthMissingError: "Check IGNITION_API_TOKEN (env or .env)",
-    AuthScopeError: "Token lacks required scope — review token permissions in Gateway UI",
+    AuthMissingError: "Check IGNITION_API_TOKEN (env or .env) is the full name:secret; over http://, turn off 'Require secure connections' on the gateway API key",
+    AuthScopeError: "The API key cannot write — give it a security level listed in Gateway Write Permissions (Platform > Security > General Settings)",
     PayloadError: "Server response body included above — paste into gateway logs for context",
     GatewayError: "Gateway error — retry after ensuring the gateway is up",
     NetworkError: "Network error — check IGNITION_URL is reachable from this host (use http://localhost:PORT if running outside docker network)",

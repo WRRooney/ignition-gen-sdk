@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     """Gateway credentials and operational defaults.
 
     ``ignition_api_key`` holds the FULL ``X-Ignition-API-Token`` header value,
-    i.e. ``<name>:<secret>`` exactly as the gateway's API Token page shows it.
+    i.e. ``<name>:<secret>`` exactly as the gateway shows it once when the API key is created.
     """
 
     ignition_api_key: str = Field(
@@ -99,7 +99,7 @@ class Settings(BaseSettings):
         if not sep or not name or not secret:
             raise ValueError(
                 "IGNITION_API_TOKEN must be the full header value '<name>:<secret>' "
-                "as shown on the gateway's API Tokens page."
+                "as shown when the API key was created (Platform > Security > API Keys)."
             )
         return v
 

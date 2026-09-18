@@ -12,7 +12,7 @@ Behavior contracts:
   outcome; "Push successful" on empty/dict result.
 - AuthMissingError → stderr "Auth error: check IGNITION_API_TOKEN in
   .env"; exit code 1.
-- AuthScopeError → stderr "Permission error: token lacks required scope
+- AuthScopeError → stderr "Permission error: ... Hint: the API key cannot write
   — check Gateway UI"; exit code 1.
 - PayloadError → stderr "Payload error: <body>"; exit code 1.
 - GatewayError → stderr "Gateway error: <message>"; exit code 1.
@@ -332,7 +332,7 @@ class TestTagPushAuthMissing(unittest.TestCase):
 
 
 class TestTagPushAuthScope(unittest.TestCase):
-    """403 → AuthScopeError → 'Permission error: token lacks required scope ...'."""
+    """403 → AuthScopeError → 'Permission error' plus a write-permissions hint."""
 
     def test_auth_scope_message_and_exit_code(self) -> None:
         from ignition_gen_sdk.backends.api_client import AuthScopeError
@@ -351,7 +351,7 @@ class TestTagPushAuthScope(unittest.TestCase):
 
         self.assertEqual(result.exit_code, 1)
         self.assertIn("Permission error", result.stderr)
-        self.assertIn("scope", result.stderr.lower())
+        self.assertIn("gateway write permissions", result.stderr.lower())
         self.assertNotIn("test-secret-DO-NOT-LEAK", result.stderr)
 
 

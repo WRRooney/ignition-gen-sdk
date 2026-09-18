@@ -28,7 +28,7 @@ Environment variables, or a `.env` in the working directory (see `.env.example`)
 | Variable | Required | Meaning |
 |---|---|---|
 | `IGNITION_URL` | yes | Gateway base URL, e.g. `http://localhost:8088` |
-| `IGNITION_API_TOKEN` | yes | Full `<name>:<secret>` value from the gateway's API Tokens page |
+| `IGNITION_API_TOKEN` | yes | Full `<name>:<secret>` value shown once when you create the key under Platform > Security > API Keys |
 | `IGNITION_DATA_DIR` | for disk writes | The gateway data directory (holds `config/resources/`, `projects/`) |
 | `IGNITION_PROJECT` | no | Default Perspective project (`Global`) |
 | `IGNITION_TAG_PROVIDER` | no | Default tag provider (`default`) |
