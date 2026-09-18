@@ -1,0 +1,17 @@
+# openapi-python-client configuration for Ignition HTTP API codegen.
+# Used by regen/engine.py _run_codegen() via:
+#   python -m openapi_python_client generate --path <spec> --config <this> --output-path <out> --overwrite
+#
+# package_name_override: Python package name inside the generated directory.
+# project_name_override: pyproject.toml / wheel project name for the generated package.
+# package_version_override: pinned at 0.0.0 (build artifact; never published).
+# use_path_prefixes_for_title_model_names: avoids anonymous model name collisions (554 oneOf usages in spec).
+# post_hooks: ruff format + ruff check --fix run after generation to normalize whitespace + imports.
+# Note: generate_all_tags is not a valid config key; omitted (default behavior is correct).
+package_name_override: "ignition_api_client"
+project_name_override: "ignition-api-client"
+package_version_override: "0.0.0"
+use_path_prefixes_for_title_model_names: true
+post_hooks:
+  - "ruff format ."
+  - "ruff check . --fix"

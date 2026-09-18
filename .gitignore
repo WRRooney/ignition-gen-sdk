@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+# SDK state dir (manifest, generated client, screenshots) lives in the user's cwd
+.ign/
+.env
+# CLI output when run from the repo root
+/config/
