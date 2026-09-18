@@ -20,6 +20,12 @@ import os
 # that is already present in the process environment (e.g. from .env exports).
 os.environ.setdefault("IGNITION_API_TOKEN", "test:test-secret-DO-NOT-LEAK")
 
+# Typer forces colored Rich output when any of these is set (GitHub Actions sets
+# GITHUB_ACTIONS). The ANSI codes split option names like `--search`, so tests
+# asserting on help text would fail only in CI. Must run before typer is imported.
+for _var in ("GITHUB_ACTIONS", "FORCE_COLOR", "PY_COLORS"):
+    os.environ.pop(_var, None)
+
 from ignition_gen_sdk.config import Settings  # noqa: E402
 
 # Gateway base URL for tests, resolved the way the SDK resolves it: IGNITION_URL
