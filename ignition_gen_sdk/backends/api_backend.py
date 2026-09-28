@@ -397,6 +397,28 @@ class ApiBackend:
         self._client._raise_for_status(r)
         return r.json()
 
+    # ---- gateway security properties (singleton resource) ----
+
+    _SECURITY_PROPS_PATH = "/data/api/v1/resources/ignition/security-properties"
+
+    def get_security_properties(self) -> dict:
+        """The security-properties envelope: ``{signature, config, enabled, ...}``.
+
+        ``config`` holds the five permission sets plus auth settings; ``signature``
+        is required by :meth:`update_security_properties`.
+        """
+        r = self._client.request("GET", "/data/api/v1/resources/singleton/ignition/security-properties")
+        return r.json()
+
+    def update_security_properties(self, signature: str, config: dict[str, Any]) -> dict:
+        """PUT the whole ``config`` back. ``signature`` must come from a prior get."""
+        if not signature:
+            raise ValueError(
+                "update_security_properties requires the signature from get_security_properties()."
+            )
+        r = self._client.request("PUT", self._SECURITY_PROPS_PATH, json=[{"signature": signature, "config": config}])
+        return r.json() if r.text else {}
+
     def delete_provider(self, name: str, signature: str) -> dict:
         """``DELETE /ignition/tag-provider/{name}/{signature}`` — single delete.
 

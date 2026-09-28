@@ -73,7 +73,7 @@ backend.write_view("Demo", "Demo/Hello", view)
 ```
 
 `ignition_gen_sdk` re-exports the stable surface: `Settings`, models (`Tag`,
-`UdtType`, `UdtInstance`, `Alarm`, `PermissionSet`, `SecurityLevel`, `TagProviderConfig`, `View`,
+`UdtType`, `UdtInstance`, `Alarm`, `PermissionSet`, `SecurityLevel`, `SecurityProperties`, `TagProviderConfig`, `View`,
 `Component`), `ViewBuilder`,
 `TagBuilder`, the backends (`IgnitionAPIClient`, `ApiBackend`, `DiskBackend`,
 `ProjectDiskBackend`, `WriteRouter`, `ScanClient`) and `seed_guard`. Deeper
@@ -87,6 +87,7 @@ module paths work but may move between minor versions.
 | `view` | build, write, set-prop, replace-text, delete, validate | disk |
 | `page`, `session-props`, `script`, `named-query`, `style-class`, `stylesheet`, `theme` | write/list/delete per resource | disk |
 | `provider`, `db-conn`, `alarm-journal`, `driver` | list, get, create, update, delete, rename, describe | API |
+| `security` | get, set-permissions, update: the gateway access/read/write/designer/create-project permission sets | API |
 | `alarm-pipeline` | list, show, replace-text, copy | disk |
 | `api` | any `/data/api/v1/*` call, `--strict` validates against the spec | API |
 | `openapi` | fetch (refresh the spec), gen, docs | `.ign/` |

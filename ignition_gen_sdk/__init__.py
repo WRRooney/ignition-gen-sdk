@@ -16,6 +16,7 @@ from .builders.tag_builder import TagBuilder
 from .builders.view import ViewBuilder
 from .config import Settings
 from .models.security import PermissionSet, SecurityLevel
+from .models.security_properties import SecurityProperties
 from .models.tag_provider import TagProviderConfig
 from .models.tags.alarm import Alarm
 from .models.tags.tag import Tag
@@ -33,6 +34,7 @@ __all__ = [
     "Alarm",
     "PermissionSet",
     "SecurityLevel",
+    "SecurityProperties",
     "TagProviderConfig",
     "View",
     "Component",

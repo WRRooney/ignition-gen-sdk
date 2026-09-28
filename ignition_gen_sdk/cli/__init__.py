@@ -24,6 +24,7 @@ from .cmd_stylesheet import stylesheet_app
 from .cmd_alarm_pipeline import alarm_pipeline_app
 from .cmd_named_query import named_query_app
 from .cmd_script import script_app
+from .cmd_security import security_app
 from .cmd_tag import tag_app
 from .cmd_theme import theme_app
 from .cmd_tools import tools_app
@@ -45,6 +46,7 @@ app.add_typer(style_class_app, name="style-class", help="Perspective style class
 app.add_typer(stylesheet_app, name="stylesheet", help="Perspective project stylesheet: upsert/show ign CSS blocks.")
 app.add_typer(theme_app, name="theme", help="Perspective themes: list, write, copy-base + delete.")
 app.add_typer(provider_app, name="provider", help="Tag provider CRUD.")
+app.add_typer(security_app, name="security", help="Gateway security properties: get, update, set-permissions.")
 app.add_typer(db_conn_app, name="db-conn", help="Database connection CRUD.")
 app.add_typer(alarm_journal_app, name="alarm-journal", help="Alarm journal profile CRUD.")
 app.add_typer(alarm_pipeline_app, name="alarm-pipeline", help="Alarm pipelines: show + surgical text replace.")
