@@ -73,7 +73,8 @@ backend.write_view("Demo", "Demo/Hello", view)
 ```
 
 `ignition_gen_sdk` re-exports the stable surface: `Settings`, models (`Tag`,
-`UdtType`, `UdtInstance`, `Alarm`, `View`, `Component`), `ViewBuilder`,
+`UdtType`, `UdtInstance`, `Alarm`, `PermissionSet`, `SecurityLevel`, `TagProviderConfig`, `View`,
+`Component`), `ViewBuilder`,
 `TagBuilder`, the backends (`IgnitionAPIClient`, `ApiBackend`, `DiskBackend`,
 `ProjectDiskBackend`, `WriteRouter`, `ScanClient`) and `seed_guard`. Deeper
 module paths work but may move between minor versions.

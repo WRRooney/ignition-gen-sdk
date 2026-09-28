@@ -39,6 +39,7 @@ from typing import Annotated, Literal, Optional, Union
 from pydantic import BeforeValidator, ConfigDict, model_serializer, model_validator
 
 from ..base import IgnitionBaseModel
+from ..security import PermissionSet
 
 # Shared ConfigDict for the two node models that accept flat meta_* extras.
 _META_EXTRA_CONFIG = ConfigDict(
@@ -95,6 +96,8 @@ class UdtInstance(IgnitionBaseModel):
     typeId: str
     tooltip: Optional[str] = None
     enabled: Optional[bool] = None
+    readPermissions: Optional[PermissionSet] = None
+    writePermissions: Optional[PermissionSet] = None
     parameters: Optional[dict[str, UdtParameter]] = None
     tags: Annotated[
         Optional[list["UdtMemberTag"]],

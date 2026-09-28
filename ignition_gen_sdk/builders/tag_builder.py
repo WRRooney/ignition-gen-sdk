@@ -16,6 +16,7 @@ from ..models.tags.alarm import Alarm
 from ..models.tags.enums.tag_datatype import TagDataType
 from ..models.tags.enums.tag_type import TagType
 from ..models.tags.enums.tag_value_source import TagValueSource
+from ..models.security import PermissionSet
 from ..models.tags.tag import Tag
 
 
@@ -58,6 +59,21 @@ class TagBuilder:
 
     def enabled(self, v: bool = True) -> Self:
         self._data["enabled"] = v
+        return self
+
+    # ---- Security ----
+
+    def permissions(
+        self,
+        *,
+        read: "PermissionSet | None" = None,
+        write: "PermissionSet | None" = None,
+    ) -> Self:
+        """Set ``readPermissions`` / ``writePermissions`` (see :class:`PermissionSet`)."""
+        if read is not None:
+            self._data["readPermissions"] = read
+        if write is not None:
+            self._data["writePermissions"] = write
         return self
 
     # ---- Data type ----

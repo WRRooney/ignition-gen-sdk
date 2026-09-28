@@ -27,6 +27,7 @@ from typing import Annotated
 from pydantic import BeforeValidator, ConfigDict, create_model, field_validator, model_validator
 
 from ..base import IgnitionBaseModel
+from ..security import PermissionSet
 from .alarm import Alarm
 from .enums.tag_datatype import TagDataType
 from .enums.tag_scale_mode import TagScaleMode
@@ -154,6 +155,10 @@ class Tag(IgnitionBaseModel):
 
     # Security Data Properties
     readOnly: Optional[bool] = None
+    # Security: who may read the value / write to it. Checked in addition to the
+    # provider's own permission sets. Absent means inherited (folder/type) or open.
+    readPermissions: Optional[PermissionSet] = None
+    writePermissions: Optional[PermissionSet] = None
 
     # History Properties
     historyEnabled: Optional[bool] = None

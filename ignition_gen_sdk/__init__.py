@@ -15,6 +15,8 @@ from .backends.scan_client import ScanClient, ScanWarning
 from .builders.tag_builder import TagBuilder
 from .builders.view import ViewBuilder
 from .config import Settings
+from .models.security import PermissionSet, SecurityLevel
+from .models.tag_provider import TagProviderConfig
 from .models.tags.alarm import Alarm
 from .models.tags.tag import Tag
 from .models.tags.udt import UdtInstance, UdtType
@@ -29,6 +31,9 @@ __all__ = [
     "UdtType",
     "UdtInstance",
     "Alarm",
+    "PermissionSet",
+    "SecurityLevel",
+    "TagProviderConfig",
     "View",
     "Component",
     "ViewBuilder",

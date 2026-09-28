@@ -29,6 +29,7 @@ from pathlib import Path
 from typing import Annotated, Any
 
 import typer
+from pydantic import ValidationError
 
 from ..backends.api_backend import ApiBackend
 from ..backends.api_client import (
@@ -42,6 +43,7 @@ from ..backends.api_client import (
 from ..backends.scan_client import ScanClient, ScanWarning
 from ..config import Settings
 from ..manifest.manifest import record as _manifest_record
+from ..models.tag_provider import TagProviderConfig
 from ._errors import render_error
 
 # Provider commands always use the API backend.
@@ -255,6 +257,10 @@ def create_cmd(
     """Create a new tag provider from a JSON config file."""
     try:
         config_dict = _read_config(config_file)
+        TagProviderConfig.model_validate(config_dict)  # typed check of profile/settings/permissions
+    except ValidationError as e:
+        render_error(ValueError(f"config file '{config_file}' is not a valid tag-provider config: {e}"), no_color=False)
+        raise typer.Exit(code=1) from None
     except (OSError, json.JSONDecodeError) as e:
         render_error(ValueError(f"could not read config file '{config_file}': {e}"), no_color=False)
         raise typer.Exit(code=1) from None
@@ -329,6 +335,10 @@ def update_cmd(
     """Update an existing tag provider (fetches signature first, then updates)."""
     try:
         config_dict = _read_config(config_file)
+        TagProviderConfig.model_validate(config_dict)  # typed check of profile/settings/permissions
+    except ValidationError as e:
+        render_error(ValueError(f"config file '{config_file}' is not a valid tag-provider config: {e}"), no_color=False)
+        raise typer.Exit(code=1) from None
     except (OSError, json.JSONDecodeError) as e:
         render_error(ValueError(f"could not read config file '{config_file}': {e}"), no_color=False)
         raise typer.Exit(code=1) from None
