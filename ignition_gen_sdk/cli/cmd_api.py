@@ -274,6 +274,10 @@ def api_cmd(
         bool,
         typer.Option("--no-color", help="Suppress Rich color output."),
     ] = False,
+    out: Annotated[
+        Path | None,
+        typer.Option("--out", help="Save the raw response body to this file (binary-safe, e.g. a project export zip)."),
+    ] = None,
 ) -> None:
     """Generic Ignition HTTP API call. Curl-like positional METHOD + PATH.
 
@@ -335,6 +339,10 @@ def api_cmd(
     #    canonical order verbatim (log scanners assert this ordering).
     try:
         response = client.request(method, path, json=body)
+        if out is not None:
+            out.write_bytes(response.content)
+            typer.echo(f"Saved {len(response.content)} bytes to {out}")
+            return
         typer.echo(scrub_token(json.dumps(response.json() if response.text else {}, indent=2)))
     except AuthMissingError as e:
         render_error(e, no_color=no_color)
