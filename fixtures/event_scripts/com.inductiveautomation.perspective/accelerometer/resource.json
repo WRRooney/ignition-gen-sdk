@@ -1,0 +1,17 @@
+{
+  "scope": "G",
+  "version": 1,
+  "restricted": false,
+  "overridable": true,
+  "files": [
+    "onAccelerometerDataReceived.py"
+  ],
+  "attributes": {
+    "lastModificationSignature": "2b0be49559d11bae6f10f219c2571ca00de316dd3063b238226ee1a79738f218",
+    "lastModification": {
+      "actor": "wrooney",
+      "timestamp": "2026-09-29T20:36:53Z"
+    },
+    "enabled": true
+  }
+}

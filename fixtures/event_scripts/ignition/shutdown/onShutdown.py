@@ -1,0 +1,2 @@
+def onShutdown():
+	pass

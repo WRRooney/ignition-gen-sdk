@@ -1,0 +1,17 @@
+{
+  "scope": "G",
+  "version": 1,
+  "restricted": false,
+  "overridable": true,
+  "files": [
+    "handleSubmission.py"
+  ],
+  "attributes": {
+    "lastModificationSignature": "5ef0c741136e812280a18667c282f3a2b6890c4f62e6e0e130ea746143c58b2a",
+    "lastModification": {
+      "actor": "wrooney",
+      "timestamp": "2026-09-29T20:36:53Z"
+    },
+    "enabled": true
+  }
+}

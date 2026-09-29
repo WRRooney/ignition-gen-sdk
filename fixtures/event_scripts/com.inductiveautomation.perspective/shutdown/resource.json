@@ -1,0 +1,17 @@
+{
+  "scope": "G",
+  "version": 1,
+  "restricted": false,
+  "overridable": true,
+  "files": [
+    "onShutdown.py"
+  ],
+  "attributes": {
+    "lastModificationSignature": "6472743a98dfa0794819103e8fcc94544e3a514f4de70973a22b500175612a56",
+    "lastModification": {
+      "actor": "wrooney",
+      "timestamp": "2026-09-29T20:36:53Z"
+    },
+    "enabled": true
+  }
+}

@@ -24,6 +24,7 @@ from .cmd_stylesheet import stylesheet_app
 from .cmd_alarm_pipeline import alarm_pipeline_app
 from .cmd_named_query import named_query_app
 from .cmd_script import script_app
+from .cmd_event import event_app
 from .cmd_security import security_app
 from .cmd_tag import tag_app
 from .cmd_theme import theme_app
@@ -39,6 +40,7 @@ app = typer.Typer(
 app.add_typer(tag_app, name="tag", help="Tag operations: build, push.")
 app.add_typer(view_app, name="view", help="Perspective view operations: build, write.")
 app.add_typer(script_app, name="script", help="Project library script operations: write.")
+app.add_typer(event_app, name="event", help="Gateway and session event scripts: kinds, list, write, replace-text, delete.")
 app.add_typer(page_app, name="page", help="Perspective page-config: mount + list pages.")
 app.add_typer(session_props_app, name="session-props", help="Perspective session-props: declare custom session properties.")
 app.add_typer(named_query_app, name="named-query", help="Named query operations: write, list.")

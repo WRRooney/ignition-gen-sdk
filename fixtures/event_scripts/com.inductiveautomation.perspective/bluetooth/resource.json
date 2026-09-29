@@ -1,0 +1,17 @@
+{
+  "scope": "G",
+  "version": 1,
+  "restricted": false,
+  "overridable": true,
+  "files": [
+    "onBluetoothReceived.py"
+  ],
+  "attributes": {
+    "lastModificationSignature": "533b32ea29da9428c699b33a4be24a189fdc9976823dede43f6c44af8d5985d9",
+    "lastModification": {
+      "actor": "wrooney",
+      "timestamp": "2026-09-29T20:36:53Z"
+    },
+    "enabled": true
+  }
+}

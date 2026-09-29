@@ -1,0 +1,2 @@
+def handleMessage(payload):
+	pass

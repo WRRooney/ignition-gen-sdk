@@ -1,0 +1,17 @@
+{
+  "scope": "G",
+  "version": 1,
+  "restricted": false,
+  "overridable": true,
+  "files": [
+    "onAuthChallengeCompleted.py"
+  ],
+  "attributes": {
+    "lastModificationSignature": "03911dc88089808281eaad1c8ac4e6258a4d29c860b7ee8bb450f66dd44484af",
+    "lastModification": {
+      "actor": "wrooney",
+      "timestamp": "2026-09-29T20:36:53Z"
+    },
+    "enabled": true
+  }
+}

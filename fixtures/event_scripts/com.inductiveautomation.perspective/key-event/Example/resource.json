@@ -1,0 +1,30 @@
+{
+  "scope": "G",
+  "version": 1,
+  "restricted": false,
+  "overridable": true,
+  "files": [
+    "onKeyEvent.py"
+  ],
+  "attributes": {
+    "eventMode": "KEYUP",
+    "regexPattern": "",
+    "preventDefaultEventOption": true,
+    "enabled": true,
+    "eventBoundCode": "",
+    "capturePhaseEventOption": true,
+    "metaEventModifier": true,
+    "eventBound": "KEY",
+    "stopPropagationEventOption": true,
+    "lastModificationSignature": "fea87fb8f039f29c095e7074c9dfe7da520884a83221b97f8d1b4376d8bb107b",
+    "altEventModifier": true,
+    "lastModification": {
+      "actor": "wrooney",
+      "timestamp": "2026-09-29T20:36:53Z"
+    },
+    "regexWindow": 1,
+    "controlEventModifier": true,
+    "shiftEventModifier": true,
+    "eventBoundKey": "Enter"
+  }
+}

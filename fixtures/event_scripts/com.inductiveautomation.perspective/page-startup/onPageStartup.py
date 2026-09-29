@@ -1,0 +1,2 @@
+def onPageStartup(page):
+	pass

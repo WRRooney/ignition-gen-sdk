@@ -1,0 +1,26 @@
+{
+  "scope": "G",
+  "version": 1,
+  "restricted": false,
+  "overridable": true,
+  "files": [
+    "onTagChange.py"
+  ],
+  "attributes": {
+    "changeTypes": [
+      "ValueChange",
+      "QualityChange",
+      "TimestampChange"
+    ],
+    "lastModificationSignature": "9ab006e65b5f3fdbdccc0f07c0377fb54569e65b4feb0c688f99ffcb890d8442",
+    "paths": [
+      "*/example1/*",
+      "*/example2/*"
+    ],
+    "lastModification": {
+      "actor": "wrooney",
+      "timestamp": "2026-09-29T20:35:30Z"
+    },
+    "enabled": true
+  }
+}

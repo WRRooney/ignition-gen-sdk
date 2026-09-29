@@ -1,0 +1,17 @@
+{
+  "scope": "G",
+  "version": 1,
+  "restricted": false,
+  "overridable": true,
+  "files": [
+    "onNdefDataReceived.py"
+  ],
+  "attributes": {
+    "lastModificationSignature": "e2a18b74ec8eaede01846fad7ef611b04cc1726e870f185c2f7edddeeef64b5a",
+    "lastModification": {
+      "actor": "wrooney",
+      "timestamp": "2026-09-29T20:36:53Z"
+    },
+    "enabled": true
+  }
+}
