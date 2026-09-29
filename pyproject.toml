@@ -42,6 +42,8 @@ packages = ["ignition_gen_sdk"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# live-gateway smoke tests are opt-in: `pytest -m smoke` overrides this
+addopts = ["-m", "not smoke"]
 markers = [
     "smoke: opt-in live-gateway tests; need IGNITION_URL + IGNITION_API_TOKEN. Run with `pytest -m smoke`.",
 ]
