@@ -125,6 +125,10 @@ SYSTEM_FUNCTIONS_8_3: frozenset[str] = frozenset({
     'system.db.getConnections',
     'system.db.removeDatasource',
     'system.db.rollbackTransaction',
+    # runNamedQuery: omitted by the crawl (8.3 documents execQuery for named
+    # queries), but still present on a live 8.3 gateway; hand-added like
+    # toDataSet/toPyDataSet above.
+    'system.db.runNamedQuery',
     'system.db.runPrepQuery',
     'system.db.runPrepUpdate',
     'system.db.runSFPrepUpdate',

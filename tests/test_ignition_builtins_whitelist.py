@@ -276,3 +276,14 @@ def test_all_framework_system_calls_are_whitelisted() -> None:
     # Project scripts use 8.3 system.tag.browse, not the 7.x-dead
     # system.tag.browseTags; browseTags stays OUT of the whitelist (it IS broken).
     assert not bad, f"framework scripts call non-whitelisted system.* functions: {bad}"
+
+
+def test_named_query_calls_known_to_both_lists() -> None:
+    # 8.3 runs named queries via system.db.execQuery/execScalar/execUpdate;
+    # runNamedQuery is the legacy name, still present on a live 8.3 gateway.
+    from ignition_gen_sdk.validation._ia_8_3_builtins import SYSTEM_FUNCTIONS_8_3
+
+    calls = ["execQuery", "execScalar", "execUpdate", "execUpdateAsync", "runNamedQuery"]
+    code = "\n".join("system.db.%s('Q/x', {})" % c for c in calls)
+    assert unknown_system_calls(code) == []
+    assert {"system.db." + c for c in calls} <= SYSTEM_FUNCTIONS_8_3
