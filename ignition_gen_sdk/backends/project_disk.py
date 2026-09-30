@@ -42,7 +42,18 @@ if TYPE_CHECKING:  # pragma: no cover
     from ..models.session_props import SessionProps
 
 # ign-owned stylesheet block delimiters (see write_stylesheet_block).
-_BLOCK_DELIM_RE = re.compile(r"/\*\s*(>>>|<<<)\s*ign:")
+_BLOCK_DELIM_RE = re.compile(r"/\*\s*(>>>|<<<)\s*(ign|ig-gen):")
+
+
+def _stylesheet_block_delims(existing: str, marker: str) -> tuple[str, str]:
+    """Delimiters of ``marker``'s block in ``existing``: ``ign:``, or the
+    legacy ``ig-gen:`` prefix of blocks written before the rename. Falls back
+    to ``ign:`` when neither is present, so a new block gets the new prefix."""
+    for prefix in ("ign", "ig-gen"):
+        begin, end = f"/* >>> {prefix}:{marker} */", f"/* <<< {prefix}:{marker} */"
+        if begin in existing and end in existing:
+            return begin, end
+    return f"/* >>> ign:{marker} */", f"/* <<< ign:{marker} */"
 
 # A named-query bind parameter. The lookbehind rejects Postgres's ``::`` cast
 # operator and any ``word:word`` run, so only a real ``:name`` token matches.
@@ -449,10 +460,10 @@ class ProjectDiskBackend:
         if _BLOCK_DELIM_RE.search(css):
             # a stray delimiter inside the payload would corrupt future upserts
             raise ValueError("css payload must not contain ign block delimiters.")
-        begin, end = f"/* >>> ign:{marker} */", f"/* <<< ign:{marker} */"
-        block = f"{begin}\n{css.strip()}\n{end}\n"
-
         existing = self.read_stylesheet(project)
+        begin, end = _stylesheet_block_delims(existing, marker)
+        # a legacy ig-gen: block is rewritten in place under the ign: prefix
+        block = f"/* >>> ign:{marker} */\n{css.strip()}\n/* <<< ign:{marker} */\n"
         if begin in existing and end in existing:
             head, rest = existing.split(begin, 1)
             _, tail = rest.split(end, 1)
@@ -485,8 +496,8 @@ class ProjectDiskBackend:
                 f"stylesheet marker {marker!r} must be 1-64 chars of "
                 "letters/digits/dot/dash/underscore."
             )
-        begin, end = f"/* >>> ign:{marker} */", f"/* <<< ign:{marker} */"
         existing = self.read_stylesheet(project)
+        begin, end = _stylesheet_block_delims(existing, marker)
         if begin not in existing or end not in existing:
             return False
         head, rest = existing.split(begin, 1)

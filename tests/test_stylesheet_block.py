@@ -102,5 +102,22 @@ def test_remove_is_idempotent_and_validates_the_marker():
             be.remove_stylesheet_block("Demo", "bad marker!")
 
 
+def test_upsert_and_remove_find_a_legacy_ig_gen_block():
+    legacy = "/* >>> ig-gen:nav */\n.a { color: red; }\n/* <<< ig-gen:nav */\n"
+    with tempfile.TemporaryDirectory() as d:
+        be = _backend(Path(d))
+        be.write_stylesheet_block("Demo", "seed", ".s {}")  # creates the file
+        css_path = be._project_stylesheet_dir("Demo") / "stylesheet.css"
+        css_path.write_text(HAND + legacy + HAND)
+
+        be.write_stylesheet_block("Demo", "nav", ".a { color: blue; }")
+        # replaced in place under the new prefix, not appended as a duplicate
+        assert css_path.read_text() == HAND + "/* >>> ign:nav */\n.a { color: blue; }\n/* <<< ign:nav */\n" + HAND
+
+        css_path.write_text(HAND + legacy)
+        assert be.remove_stylesheet_block("Demo", "nav") is True
+        assert "nav" not in css_path.read_text()
+
+
 if __name__ == "__main__":
     raise SystemExit(pytest.main([__file__, "-q"]))
