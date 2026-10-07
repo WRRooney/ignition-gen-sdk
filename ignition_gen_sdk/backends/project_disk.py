@@ -78,15 +78,21 @@ _HTML_SAFE_ESCAPES = {
 }
 
 
+def designer_escape(text: str) -> str:
+    """Apply Gson's HTML-safe escapes (``=`` -> ``\\u003d`` etc.) to text that
+    lands inside a JSON string. Backslashes are untouched, so already-escaped
+    text passes through unchanged."""
+    for raw, escaped in _HTML_SAFE_ESCAPES.items():
+        text = text.replace(raw, escaped)
+    return text
+
+
 def dumps_designer(payload: object, indent: int = 2) -> str:
     """json.dumps with Gson's HTML-safe escaping — byte-comparable to a
     Designer save, so ign writes do not churn on round-trip. Non-ASCII stays
     LITERAL (``m³``, ``—``) — Gson never \\u-escapes it; json.dumps' default did,
     churning every such line of a Designer-authored udts.json."""
-    text = json.dumps(payload, indent=indent, ensure_ascii=False)
-    for raw, escaped in _HTML_SAFE_ESCAPES.items():
-        text = text.replace(raw, escaped)
-    return text
+    return designer_escape(json.dumps(payload, indent=indent, ensure_ascii=False))
 
 
 def sql_bind_parameters(sql: str) -> set[str]:

@@ -128,3 +128,18 @@ class TestViewReplaceText(unittest.TestCase):
         self.assertEqual(self._run("--old", "x", "--new", "x").exit_code, 1)
         self.assertEqual(self._run("--old", "", "--new", "y").exit_code, 1)
         self.assertEqual(json.loads(self._text()), VIEW)
+
+    def test_plain_equals_matches_a_designer_escaped_view(self):
+        """A Designer save stores `=` as \\u003d; --old/--new may type it plainly."""
+        from ignition_gen_sdk.backends.project_disk import dumps_designer
+
+        (self.view_dir / "view.json").write_text(dumps_designer(VIEW))
+        self.assertIn("scope\\u003d", self._text())
+        r = self._run("--old", 'scope=\\"page\\"', "--new", 'scope=\\"session\\"', "--expect", "1")
+        self.assertEqual(r.exit_code, 0, msg=r.stdout + (r.stderr or ""))
+        handler = json.loads(self._text())["root"]["scripts"]["messageHandlers"][0]
+        self.assertTrue(handler["script"].endswith('scope="session")'))
+        self.assertIn('scope\\u003d\\"session\\"', self._text())
+        # the hand-escaped form still works
+        r = self._run("--old", 'scope\\u003d\\"session\\"', "--new", 'scope\\u003d\\"page\\"')
+        self.assertEqual(r.exit_code, 0, msg=r.stdout + (r.stderr or ""))

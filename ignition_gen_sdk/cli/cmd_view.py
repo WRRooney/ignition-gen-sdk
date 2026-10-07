@@ -26,7 +26,7 @@ import typer
 
 from ..backends._fs_utils import _encode_segment
 from ..backends.api_client import AuthMissingError, AuthScopeError, GatewayError, NetworkError, PayloadError
-from ..backends.project_disk import ProjectDiskBackend, ProjectNotFoundError, ViewNotFoundError
+from ..backends.project_disk import ProjectDiskBackend, ProjectNotFoundError, ViewNotFoundError, designer_escape
 from ..backends.scan_client import ScanClient, ScanWarning
 from ..builders.view import ViewBuilder
 from ..config import DEFAULT_STATE_DIR, Settings
@@ -473,10 +473,10 @@ def view_replace_text_cmd(
             "--old",
             help=(
                 "Exact literal text to replace in view.json (not a regex). Matched "
-                "against the RAW FILE, so it must be written the way the serializer "
-                "stores it: inner quotes escaped, and `=` written \\u003d. Prefer a "
-                "token with neither (a messageType, a style class) and let --expect "
-                "catch a miss."
+                "against the RAW FILE, so inner quotes must be escaped (\\\"). "
+                "Type = ' < > & plainly: when the literal text is absent, the "
+                "Designer-escaped form (\\u003d etc.) is tried, and --new is "
+                "escaped to match. Let --expect catch a miss."
             ),
         ),
     ],
@@ -552,6 +552,13 @@ def view_replace_text_cmd(
         raise typer.Exit(code=1) from None
 
     found = raw_text.count(old)
+    if not found:
+        # The Designer stores = ' < > & inside strings as \\u escapes; accept
+        # them typed plainly rather than make every caller hand-escape.
+        escaped = designer_escape(old)
+        if escaped != old and raw_text.count(escaped):
+            old, new = escaped, designer_escape(new)
+            found = raw_text.count(old)
     if expect is not None and found != expect:
         render_error(ValueError(
             f"--old occurs {found} time(s) in {view_path}/view.json, --expect said {expect}."
