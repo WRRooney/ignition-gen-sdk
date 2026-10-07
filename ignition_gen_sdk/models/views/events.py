@@ -105,6 +105,9 @@ class PopupEventHandler(IgnitionBaseModel):
     #: deleted — that is how you free a click for a nested view's own
     #: full-size target without losing the script. Absent means enabled.
     enabled: bool | None = None
+    #: Designer DOM-event option: keep the event from bubbling to a parent's
+    #: own handler (an icon inside a clickable row). Absent means it bubbles.
+    stopPropagation: bool | None = None
 
 
 class ScriptEventHandler(IgnitionBaseModel):
@@ -127,6 +130,9 @@ class ScriptEventHandler(IgnitionBaseModel):
     #: deleted — that is how you free a click for a nested view's own
     #: full-size target without losing the script. Absent means enabled.
     enabled: bool | None = None
+    #: Designer DOM-event option: keep the event from bubbling to a parent's
+    #: own handler (an icon inside a clickable row). Absent means it bubbles.
+    stopPropagation: bool | None = None
 
 
 class NavEventHandler(IgnitionBaseModel):
@@ -147,6 +153,9 @@ class NavEventHandler(IgnitionBaseModel):
     #: deleted — that is how you free a click for a nested view's own
     #: full-size target without losing the script. Absent means enabled.
     enabled: bool | None = None
+    #: Designer DOM-event option: keep the event from bubbling to a parent's
+    #: own handler (an icon inside a clickable row). Absent means it bubbles.
+    stopPropagation: bool | None = None
 
 
 # ---------------------------------------------------------------------------

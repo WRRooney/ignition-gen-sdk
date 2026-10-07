@@ -184,3 +184,15 @@ def test_eventsmap_in_views_init():
         ScriptEventConfig,
         NavEventConfig,
     )
+
+
+def test_stop_propagation_round_trips():
+    """The Designer's Stop Propagation option is a handler-level key; a view
+    carrying it (an icon inside a clickable row) must load and dump it back."""
+    from pydantic import TypeAdapter
+
+    from ignition_gen_sdk.models.views.events import EventHandler
+
+    raw = {"type": "script", "scope": "G", "stopPropagation": True, "config": {"script": "\tpass"}}
+    h = TypeAdapter(EventHandler).validate_python(raw)
+    assert h.model_dump(exclude_none=True, mode="json") == raw
