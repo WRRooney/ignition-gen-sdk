@@ -292,6 +292,8 @@ def push_cmd(
     ``--dry-run`` previews the Provider-root JSON envelope that would be
     sent to ``POST /data/api/v1/tags/import`` without calling any backend.
     With ``--file`` pushes the supplied tag(s); without it pushes the demo tag.
+    ``--backend disk`` merges into the folder's tags.json by name: same-named
+    tags are replaced, the folder's other tags are kept.
     """
     tags = _load_tags_file(file) if file is not None else [_demo_tag()]
 

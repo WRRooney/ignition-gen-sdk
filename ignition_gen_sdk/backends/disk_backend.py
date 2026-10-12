@@ -56,6 +56,25 @@ _UNARY_RESOURCE_BASE = {
 }
 
 
+def _merge_by_name(existing_file: Path, pushed: list[dict]) -> list[dict]:
+    """Fold ``pushed`` into the tag list already in ``existing_file``, keyed by name.
+
+    Same-named entries are replaced in place, new ones appended, the rest kept.
+    An unreadable or non-list file raises rather than being overwritten.
+    """
+    if not existing_file.exists():
+        return pushed
+    try:
+        current = json.loads(existing_file.read_text(encoding="utf-8"))
+    except ValueError as e:
+        raise ValueError(f"{existing_file} is not valid JSON; refusing to overwrite it: {e}") from None
+    if not isinstance(current, list):
+        raise ValueError(f"{existing_file} does not hold a tag list; refusing to overwrite it")
+    by_name = {t.get("name"): t for t in pushed}
+    merged = [by_name.pop(t.get("name"), t) for t in current]
+    return merged + [t for t in pushed if t.get("name") in by_name]
+
+
 class DiskBackend:
     """Writes tag-definition resources to ``config/resources/core/``."""
 
@@ -146,6 +165,11 @@ class DiskBackend:
     ) -> Path:
         """Write ``tags.json`` + ``unary-resource.json``.
 
+        MERGES by top-level name into an existing ``tags.json``: a pushed tag
+        replaces the same-named entry in place, new tags are appended, and
+        every other entry already in the folder is kept. (A wholesale replace
+        silently deleted the folder's other tags on the next scan.)
+
         FLAT by default: 'usr' is the MANAGED-provider override envelope (see
         serializers/tag_disk.py). Pass ``wrap_usr=True`` only when writing into
         a MANAGED (driver-owned, e.g. MQTT) provider.
@@ -154,7 +178,7 @@ class DiskBackend:
         """
         dest = self._tag_def_path(provider, path)
         self._assert_not_local(dest)
-        payload = tags_to_disk(tags, wrap_usr)
+        payload = _merge_by_name(dest / "tags.json", tags_to_disk(tags, wrap_usr))
         self._write_payload_with_sidecar(
             dest, "tags.json", dumps_designer(payload)
         )

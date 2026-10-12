@@ -210,6 +210,36 @@ class TestDiskBackendWriteTags(unittest.TestCase):
         # (Drive letters on Windows would have a colon; we're on Linux.)
         self.assertNotIn(":", dest.name)
 
+    def test_push_merges_into_existing_folder_tags(self) -> None:
+        """A push keeps the folder's other tags; same name replaces in place."""
+        from ignition_gen_sdk.backends.disk_backend import DiskBackend
+
+        backend = DiskBackend(_settings_with_root(self._root))
+        dest = backend._tag_def_path("SCADA", "_Configuration")
+        dest.mkdir(parents=True)
+        (dest / "tags.json").write_text(json.dumps([
+            {"name": "RootTagPath", "tagType": "AtomicTag", "value": "[SCADA]System"},
+            {"name": "TestLevel", "tagType": "AtomicTag", "value": 1.0},
+        ]))
+        tag = _make_tag()
+        other = tag.model_copy(update={"name": "NewTag"})
+        backend.write_tags("SCADA", "_Configuration", [tag, other])
+        out = json.loads((dest / "tags.json").read_text())
+        self.assertEqual([t["name"] for t in out], ["RootTagPath", "TestLevel", "NewTag"])
+        self.assertEqual(out[0]["value"], "[SCADA]System")
+        self.assertNotIn("value", out[1])  # replaced by the pushed TestLevel
+
+    def test_push_refuses_to_overwrite_unreadable_tags_json(self) -> None:
+        from ignition_gen_sdk.backends.disk_backend import DiskBackend
+
+        backend = DiskBackend(_settings_with_root(self._root))
+        dest = backend._tag_def_path("default", "Broken")
+        dest.mkdir(parents=True)
+        (dest / "tags.json").write_text("{not json")
+        with self.assertRaises(ValueError):
+            backend.write_tags("default", "Broken", [_make_tag()])
+        self.assertEqual((dest / "tags.json").read_text(), "{not json")
+
 
 class TestDiskBackendWriteUdts(unittest.TestCase):
     def setUp(self) -> None:
