@@ -81,6 +81,21 @@ class TestSetProp(unittest.TestCase):
         self.assertEqual(v["custom"]["query"], "")  # siblings untouched
         self.assertIn("KEEP ME", (self.view_dir / "resource.json").read_text())
 
+    def test_new_param_gets_input_direction(self):
+        r = self._run("--prop", "params.showValue", "--value", "true", "--persistent")
+        self.assertEqual(r.exit_code, 0, msg=r.stdout + (r.stderr or ""))
+        v = self._view()
+        self.assertIs(v["params"]["showValue"], True)
+        self.assertEqual(v["propConfig"]["params.showValue"], {"paramDirection": "input", "persistent": True})
+
+    def test_existing_param_direction_kept(self):
+        raw = json.loads(json.dumps(VIEW))
+        raw["propConfig"]["params.popup"]["paramDirection"] = "inout"
+        (self.view_dir / "view.json").write_text(json.dumps(raw))
+        r = self._run("--prop", "params.popup", "--value", "true")
+        self.assertEqual(r.exit_code, 0, msg=r.stdout + (r.stderr or ""))
+        self.assertEqual(self._view()["propConfig"]["params.popup"]["paramDirection"], "inout")
+
     def test_value_parses_json_else_string(self):
         self.assertEqual(self._run("--prop", "custom.selected", "--value", '""').exit_code, 0)
         self.assertEqual(self._view()["custom"]["selected"], "")

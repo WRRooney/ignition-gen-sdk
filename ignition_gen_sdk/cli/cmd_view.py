@@ -861,6 +861,10 @@ def set_prop_cmd(
             target.pop(head, None)
     if persistent is not None:
         target.setdefault("propConfig", {}).setdefault(prop, {})["persistent"] = persistent
+    # A top-level view param always carries a direction; the Designer writes
+    # `input` for a new one. Never overwrite an existing direction.
+    if component is None and head == "params" and len(keys) == 1 and value is not None:
+        target.setdefault("propConfig", {}).setdefault(prop, {}).setdefault("paramDirection", "input")
     if binding is not None:
         target.setdefault("propConfig", {}).setdefault(prop, {})["binding"] = binding
     if unset_binding:
