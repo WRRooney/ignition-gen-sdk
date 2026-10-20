@@ -228,3 +228,81 @@ class TestDeleteUdtType(unittest.TestCase):
 
             with self.assertRaises((TagNotFoundError, FileNotFoundError)):
                 backend.delete_udt_type("default", "Does/NotExist")
+
+
+def _write_folder(root: Path, tags: list, udts: list | None = None) -> Path:
+    """A SCADA/Area folder holding tags.json (+ udts.json) and its sidecar."""
+    dest = root / "config" / "resources" / "core" / "ignition" / "tag-definition" / "SCADA" / "Area"
+    dest.mkdir(parents=True)
+    (dest / "tags.json").write_text(json.dumps(tags))
+    files = ["tags.json"]
+    if udts is not None:
+        (dest / "udts.json").write_text(json.dumps(udts))
+        files.append("udts.json")
+    (dest / "unary-resource.json").write_text(json.dumps({"scope": "G", "version": 1, "files": files}))
+    return dest
+
+
+def _atomic(name: str) -> dict:
+    return {"name": name, "tagType": "AtomicTag", "valueSource": "memory"}
+
+
+def _run_name_delete(root: Path, *args):
+    with patch.dict(os.environ,
+                    {"IGNITION_API_TOKEN": "test:dummy-for-delete-tests",
+                     "IGNITION_DATA_DIR": str(root)},
+                    clear=False):
+        from ignition_gen_sdk.cli import app
+        return _runner().invoke(
+            app, ["tag", "delete", "--provider", "SCADA", "--path", "Area", "--no-scan", *args]
+        )
+
+
+class TestDeleteByName(unittest.TestCase):
+    """ign tag delete --name drops matching entries and keeps siblings."""
+
+    def test_single_name_keeps_siblings(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dest = _write_folder(root, [_atomic("Keep"), _atomic("Gone"), _atomic("Also")])
+            r = _run_name_delete(root, "--name", "gone")  # case-insensitive
+            self.assertEqual(r.exit_code, 0, msg=r.output)
+            self.assertIn("Deleted: Area/Gone", r.output)
+            names = [t["name"] for t in json.loads((dest / "tags.json").read_text())]
+            self.assertEqual(names, ["Keep", "Also"])
+
+    def test_wildcard_spans_both_files_and_empties_one(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dest = _write_folder(
+                root,
+                [_atomic("Pump 1 Speed"), _atomic("Level")],
+                [{"name": "Pump 1", "tagType": "UdtInstance", "typeId": "Motor"}],
+            )
+            r = _run_name_delete(root, "--name", "Pump*")
+            self.assertEqual(r.exit_code, 0, msg=r.output)
+            self.assertFalse((dest / "udts.json").exists())
+            self.assertEqual([t["name"] for t in json.loads((dest / "tags.json").read_text())], ["Level"])
+            self.assertEqual(json.loads((dest / "unary-resource.json").read_text())["files"], ["tags.json"])
+
+    def test_star_leaves_dataless_folder(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dest = _write_folder(root, [_atomic("A"), _atomic("B")])
+            r = _run_name_delete(root, "--name", "*")
+            self.assertEqual(r.exit_code, 0, msg=r.output)
+            self.assertTrue(dest.is_dir())
+            self.assertEqual(sorted(p.name for p in dest.iterdir()), ["unary-resource.json"])
+            self.assertEqual(json.loads((dest / "unary-resource.json").read_text())["files"], [])
+
+    def test_dry_run_and_no_match_write_nothing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dest = _write_folder(root, [_atomic("A"), _atomic("B")])
+            before = (dest / "tags.json").read_text()
+            r = _run_name_delete(root, "--name", "A", "--dry-run")
+            self.assertEqual(r.exit_code, 0, msg=r.output)
+            self.assertIn("Would delete: Area/A", r.output)
+            r = _run_name_delete(root, "--name", "Z*")
+            self.assertEqual(r.exit_code, 1, msg=r.output)
+            self.assertEqual((dest / "tags.json").read_text(), before)

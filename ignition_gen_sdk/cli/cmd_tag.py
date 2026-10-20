@@ -40,7 +40,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Annotated, Any, Optional
+from typing import Annotated, Any, List, Optional
 from urllib.parse import urlencode
 
 import typer
@@ -1128,11 +1128,22 @@ def delete_cmd(
             help="'instance' (tag-definition, default) or 'type' (tag-type-definition)",
         ),
     ] = "instance",
+    name: Annotated[
+        Optional[List[str]],
+        typer.Option(
+            "--name",
+            help=(
+                "Delete only the tags (or UDT types) with this name inside the "
+                "--path folder, keeping the rest. Wildcards: '*', '?', '[...]'; "
+                "case-insensitive. Repeatable. Omit to delete the whole folder."
+            ),
+        ),
+    ] = None,
     dry_run: Annotated[
         bool,
         typer.Option(
             "--dry-run/--no-dry-run",
-            help="Print the target directory; no filesystem change.",
+            help="Print what would be deleted; no filesystem change.",
         ),
     ] = False,
     scan: Annotated[
@@ -1147,9 +1158,10 @@ def delete_cmd(
         ),
     ] = True,
 ) -> None:
-    """Delete a tag-definition (or tag-type-definition) directory from disk.
+    """Delete a tag-definition (or tag-type-definition) directory, or named tags in it.
 
-    Removes the entire directory (tags.json / udts.json + unary-resource.json)
+    With --name, removes only the matching top-level entries of the --path
+    folder's tags.json / udts.json and keeps every sibling. Without it, removes the entire directory (tags.json / udts.json + unary-resource.json)
     under config/resources/core/ignition/tag-definition/<provider>/<path>/
     (``--kind instance``, default) or .../tag-type-definition/<provider>/<path>/
     (``--kind type``). The gateway picks up the removal on the next config
@@ -1162,6 +1174,10 @@ def delete_cmd(
             no_color=False,
         )
         raise typer.Exit(code=1)
+
+    if name:
+        _delete_by_name(provider, path, name, kind, dry_run, scan)
+        return
 
     if dry_run:
         # Encode path segments for accurate display — mirrors view delete dry-run.
@@ -1222,5 +1238,40 @@ def delete_cmd(
             f"WARNING: gateway scan failed after deleting {dest}; "
             f"the change is on disk but Designer may not see it "
             f"until the next scan tick. Reason: {e}",
+            err=True,
+        )
+
+
+def _delete_by_name(
+    provider: str, path: str, patterns: List[str], kind: str, dry_run: bool, scan: bool
+) -> None:
+    """``ign tag delete --name``: drop matching entries from one folder."""
+    try:
+        settings = Settings()  # type: ignore[call-arg]
+    except (FileNotFoundError, ValueError):
+        render_error(AuthMissingError("check that IGNITION_API_TOKEN is set"), no_color=False)
+        raise typer.Exit(code=1) from None
+    try:
+        dest, removed = DiskBackend(settings).delete_tags_by_name(
+            provider, path, patterns, kind=kind, dry_run=dry_run
+        )
+    except TagNotFoundError as e:
+        render_error(e, no_color=False)
+        raise typer.Exit(code=1) from None
+    except ValueError as e:
+        render_error(ValueError(f"invalid path - {e}"), no_color=False)
+        raise typer.Exit(code=1) from None
+    verb = "Would delete" if dry_run else "Deleted"
+    for n in removed:
+        typer.echo(f"{verb}: {path.rstrip('/')}/{n}" if path.strip("/") else f"{verb}: {n}")
+    if dry_run or not scan:
+        return
+    try:
+        with ScanClient(settings) as scan_client:
+            scan_client.scan_config()
+    except ScanWarning as e:
+        typer.echo(
+            f"WARNING: gateway scan failed after deleting from {dest}; the change "
+            f"is on disk but Designer may not see it until the next scan tick. Reason: {e}",
             err=True,
         )

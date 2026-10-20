@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import json
 import shutil
+from fnmatch import fnmatchcase
 from pathlib import Path
 from typing import Any, List
 
@@ -282,6 +283,74 @@ class DiskBackend:
 
         shutil.rmtree(dest)
         return dest
+
+    def delete_tags_by_name(
+        self,
+        provider: str,
+        path: str,
+        patterns: List[str],
+        kind: str = "instance",
+        dry_run: bool = False,
+    ) -> tuple[Path, List[str]]:
+        """Remove the top-level entries named by ``patterns`` from one folder.
+
+        Matches every entry in the folder's ``tags.json`` / ``udts.json``
+        (``kind="type"``: the tag-type-definition folder) whose name matches a
+        pattern; ``*``, ``?`` and ``[...]`` wildcards work, case-insensitive
+        like Ignition tag paths. Siblings stay byte-identical. A data file left
+        empty is removed and dropped from the sidecar; the folder itself stays
+        with ``"files": []``, the gateway's own shape for a data-less folder.
+        Subfolders are directories, not entries: delete those with
+        :meth:`delete_tag`.
+
+        Returns ``(folder, removed names)``. Raises :class:`TagNotFoundError`
+        when nothing matches; nothing is written in that case.
+        """
+        dest = (
+            self._tag_type_def_path(provider, path) if kind == "type"
+            else self._tag_def_path(provider, path)
+        )
+        self._assert_not_local(dest)
+        pats = [p.lower() for p in patterns]
+        removed: List[str] = []
+        kept_by_file: dict[str, list] = {}
+        for fname in self._DATA_FILES:
+            src = dest / fname
+            if not src.exists():
+                continue
+            try:
+                entries = json.loads(src.read_text(encoding="utf-8"))
+            except ValueError as e:
+                raise ValueError(f"{src} is not valid JSON; refusing to rewrite it: {e}") from None
+            if not isinstance(entries, list):
+                raise ValueError(f"{src} does not hold a tag list; refusing to rewrite it")
+            kept = []
+            for t in entries:
+                name = str(t.get("name", ""))
+                if any(fnmatchcase(name.lower(), p) for p in pats):
+                    removed.append(name)
+                else:
+                    kept.append(t)
+            if len(kept) != len(entries):
+                kept_by_file[fname] = kept
+        if not removed:
+            raise TagNotFoundError(
+                f"no entry in {dest} matches {', '.join(patterns)}; "
+                f"check --provider ({provider!r}), --path ({path!r}) and --name."
+            )
+        if dry_run:
+            return dest, removed
+        for fname, kept in kept_by_file.items():
+            if kept:
+                _atomic_write(dest / fname, dumps_designer(kept))
+            else:
+                (dest / fname).unlink()
+        files = [f for f in self._DATA_FILES if (dest / f).exists()]
+        _atomic_write(
+            dest / "unary-resource.json",
+            dumps_designer({**_UNARY_RESOURCE_BASE, "files": files}),
+        )
+        return dest, removed
 
     # ------------------------------------------------------------------
     # Perspective themes
