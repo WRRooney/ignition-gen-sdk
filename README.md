@@ -16,9 +16,9 @@ use it. Ignition 8.3 only.
 ## Install
 
 ```bash
-uv tool install git+https://github.com/WRRooney/ignition-gen-sdk   # or: pip install git+https://github.com/WRRooney/ignition-gen-sdk
+uv tool install ignition-gen-sdk   # or: pip install ignition-gen-sdk
 # extras: [strict] deep OpenAPI validation, [runtime] headless view validation, e.g.
-#   uv tool install 'ignition-gen-sdk[strict,runtime] @ git+https://github.com/WRRooney/ignition-gen-sdk'
+#   uv tool install 'ignition-gen-sdk[strict,runtime]'
 ```
 
 ## Configure
