@@ -54,7 +54,8 @@ def list_cmd(
     if not root.is_dir():
         typer.echo(f"No style classes in {project!r}.")
         return
-    names = sorted(p.name for p in root.iterdir() if (p / "style.json").is_file())
+    # Classes nest in folders (e.g. "Family/card"); name = path under root.
+    names = sorted(p.parent.relative_to(root).as_posix() for p in root.rglob("style.json"))
     typer.echo(f"{len(names)} style class(es) in {project!r}:")
     for n in names:
         typer.echo(f"  {n}")
@@ -178,6 +179,14 @@ def delete_cmd(
 
     typer.echo(f"Deleted style class {name!r} from {project}")
     typer.echo(f"Removed: {dest}")
+
+    if not scan:
+        return
+    try:
+        with ScanClient(settings) as scan_client:
+            scan_client.scan_projects()
+    except ScanWarning as e:
+        typer.echo(f"WARNING: gateway scan failed ({e})", err=True)
 
     if not scan:
         return

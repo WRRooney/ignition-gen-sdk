@@ -79,6 +79,17 @@ def test_delete_style_class_removes_it_and_errors_when_absent():
             be.delete_style_class("Demo", "nav-crumb-current")
 
 
+def test_delete_nested_style_class_prunes_empty_folders():
+    with tempfile.TemporaryDirectory() as d:
+        be = _backend(Path(d))
+        a = be.write_style_class("Demo", "Family/a", STYLE)
+        b = be.write_style_class("Demo", "Family/b", STYLE)
+        be.delete_style_class("Demo", "Family/a")
+        assert a.parent.is_dir()  # sibling still there
+        be.delete_style_class("Demo", "Family/b")
+        assert not a.parent.parent.exists()  # Family/ and style-classes/ gone
+
+
 def test_delete_style_class_rejects_escape_path():
     with tempfile.TemporaryDirectory() as d:
         with pytest.raises(ValueError):

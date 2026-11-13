@@ -349,6 +349,19 @@ class TestStyleClassWrite(unittest.TestCase):
                 ["style.json"],
             )
 
+    def test_list_shows_nested_classes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _make_project(root)
+            f = self._payload(root, {"base": {"color": "red"}})
+            for n in ("top", "Family/card"):
+                _invoke(root, ["style-class", "write", "--project", "Demo",
+                               "--name", n, "--file", str(f), "--no-scan"])
+            res = _invoke(root, ["style-class", "list", "--project", "Demo"])
+            self.assertEqual(res.exit_code, 0, msg=res.output)
+            self.assertIn("2 style class(es)", res.output)
+            self.assertIn("Family/card", res.output)
+
     def test_bulk_map_writes_every_class(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

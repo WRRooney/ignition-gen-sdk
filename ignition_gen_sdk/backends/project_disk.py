@@ -545,6 +545,14 @@ class ProjectDiskBackend:
                 f"style class {name!r} not found in project {project!r}."
             )
         shutil.rmtree(dest)
+        # Prune folders left empty, up to and including style-classes/ itself:
+        # an empty folder is no resource, just litter after a family delete.
+        parent = dest.parent
+        while parent == root or root in parent.parents:
+            if any(parent.iterdir()):
+                break
+            parent.rmdir()
+            parent = parent.parent
         return dest
 
     def _project_page_config_dir(self, project: str, create: bool = True) -> Path:
