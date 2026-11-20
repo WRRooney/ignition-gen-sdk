@@ -85,7 +85,8 @@ def test_delete_nested_style_class_prunes_empty_folders():
         a = be.write_style_class("Demo", "Family/a", STYLE)
         b = be.write_style_class("Demo", "Family/b", STYLE)
         be.delete_style_class("Demo", "Family/a")
-        assert a.parent.is_dir()  # sibling still there
+        assert not a.exists()
+        assert b.is_dir()  # sibling (and Family/) still there
         be.delete_style_class("Demo", "Family/b")
         assert not a.parent.parent.exists()  # Family/ and style-classes/ gone
 
