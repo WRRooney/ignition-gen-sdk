@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ignition-gen-sdk"
-version = "0.1.0"
+version = "0.2.0"
 description = "Agent SDK and CLI for Inductive Automation Ignition 8.3: typed Pydantic models, gateway API client, and on-disk resource writers."
 readme = "README.md"
 license = "Apache-2.0"
