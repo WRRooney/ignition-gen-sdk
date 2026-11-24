@@ -11,6 +11,7 @@ from .cmd_api import api_cmd
 from .cmd_builtins import builtins_app
 from .cmd_component import component_app
 from .cmd_db_conn import db_conn_app
+from .cmd_device import device_app
 from .cmd_diff import diff_cmd
 from .cmd_driver import driver_app
 from .cmd_icons import icons_app
@@ -52,6 +53,7 @@ app.add_typer(security_app, name="security", help="Gateway security properties: 
 app.add_typer(db_conn_app, name="db-conn", help="Database connection CRUD.")
 app.add_typer(alarm_journal_app, name="alarm-journal", help="Alarm journal profile CRUD.")
 app.add_typer(alarm_pipeline_app, name="alarm-pipeline", help="Alarm pipelines: show + surgical text replace.")
+app.add_typer(device_app, name="device", help="OPC UA device connections and simulator programs: list, get, describe, create, program, delete.")
 app.add_typer(driver_app, name="driver", help="Database driver introspection: list, describe.")
 app.add_typer(component_app, name="component", help="Component palette: list.")
 app.add_typer(openapi_app, name="openapi", help="Gateway OpenAPI spec: fetch, gen, docs.")

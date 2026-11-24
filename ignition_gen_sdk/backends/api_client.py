@@ -132,7 +132,7 @@ class IgnitionAPIClient:
         # Inject shared transport into generated client so both paths
         # share auth + JWE guard. Import is deferred (generated pkg may be absent
         # on fresh clone — the generated package is gitignored).
-        self._generated: "GeneratedClient | None"
+        self._generated: GeneratedClient | None
         try:
             from ignition_api_client import Client as _GenClient  # noqa: PLC0415
             self._generated = _GenClient(base_url=str(settings.ignition_base_url))
@@ -176,6 +176,8 @@ class IgnitionAPIClient:
         method: str,
         path: str,
         json: Any = None,
+        content: bytes | None = None,
+        content_type: str | None = None,
     ) -> httpx.Response:
         """Generic HTTP call. Reuses the long-lived self._client.
 
@@ -191,6 +193,10 @@ class IgnitionAPIClient:
             path: Path starting with "/", e.g. /data/api/v1/gateway-info.
                 The base_url is prepended by httpx.
             json: Optional request body. httpx serializes dicts to JSON.
+            content: Optional raw body (e.g. a resource data file). Mutually
+                exclusive with ``json``.
+            content_type: Content-Type for ``content``; overrides the
+                client's default ``application/json``.
 
         Returns:
             httpx.Response on 2xx.
@@ -203,7 +209,8 @@ class IgnitionAPIClient:
             NetworkError on transport failure (chained via `from e`).
         """
         try:
-            r = self._client.request(method, path, json=json)
+            headers = {"Content-Type": content_type} if content_type else None
+            r = self._client.request(method, path, json=json, content=content, headers=headers)
         except httpx.RequestError as e:
             # Same shape as import_tags() lines above -- one catch covers
             # ConnectError, ConnectTimeout, ReadTimeout, WriteTimeout, etc.
@@ -248,7 +255,7 @@ class IgnitionAPIClient:
     def close(self) -> None:
         self._client.close()
 
-    def __enter__(self) -> "IgnitionAPIClient":
+    def __enter__(self) -> IgnitionAPIClient:
         return self
 
     def __exit__(self, *_: object) -> None:

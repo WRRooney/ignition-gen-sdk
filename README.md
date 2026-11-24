@@ -87,6 +87,7 @@ module paths work but may move between minor versions.
 | `view` | build, write, set-prop, replace-text, delete, validate | disk |
 | `page`, `session-props`, `script`, `named-query`, `style-class`, `stylesheet`, `theme` | write/list/delete per resource | disk |
 | `provider`, `db-conn`, `alarm-journal`, `driver` | list, get, create, update, delete, rename, describe | API |
+| `device` | list, get, describe, create, program (load a simulator's instructions.csv), program-get, delete | API |
 | `security` | get, set-permissions, update: the gateway access/read/write/designer/create-project permission sets | API |
 | `alarm-pipeline` | list, show, replace-text, copy | disk |
 | `api` | any `/data/api/v1/*` call, `--strict` validates against the spec | API |
