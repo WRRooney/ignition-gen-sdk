@@ -10,7 +10,7 @@ write goes through the models, so an agent never hand-edits `view.json`.
 
 Built for AI coding agents (Claude Code, Codex, Gemini CLI, Cursor, OpenCode, …)
 that run with access to a gateway API token and, optionally, its data directory.
-The companion [ignition-skills](../ignition-skills) repo teaches agents how to
+The companion [ignition-skills](https://github.com/WRRooney/ignition-skills) repo teaches agents how to
 use it. Ignition 8.3 only.
 
 ## Install
